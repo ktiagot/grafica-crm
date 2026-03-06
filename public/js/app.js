@@ -149,8 +149,33 @@ async function apiRequest(endpoint, options = {}) {
     });
 }
 
-// Check if logged in
+// Check if logged in and validate token
 if (token) {
-    showScreen('main-screen');
-    loadPage('dashboard');
+    // Validar token fazendo uma requisição
+    fetch(`${API_URL}/clientes`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(response => {
+        if (response.ok) {
+            showScreen('main-screen');
+            loadPage('dashboard');
+        } else {
+            // Token inválido, limpar e mostrar login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            token = null;
+            currentUser = {};
+            showScreen('login-screen');
+        }
+    }).catch(() => {
+        // Erro de conexão, limpar e mostrar login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        token = null;
+        currentUser = {};
+        showScreen('login-screen');
+    });
+} else {
+    showScreen('login-screen');
 }
