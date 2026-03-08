@@ -171,9 +171,233 @@ async function loadPage(page) {
         case 'pedidos':
             await loadPedidos();
             break;
+        case 'metas':
+            await loadMetas();
+            break;
+        case 'relatorios':
+            await loadRelatorios();
+            break;
         default:
             content.innerHTML = '<div class="card"><h1>Página em desenvolvimento</h1></div>';
     }
+}
+
+async function loadMetas() {
+    const content = document.getElementById('page-content');
+    
+    content.innerHTML = `
+        <div class="page-header">
+            <h1>Metas Comerciais</h1>
+            <button class="btn btn-primary" onclick="novaMeta()">+ Definir Meta</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Meta do Mês</p>
+                    <h3 class="stat-value">R$ 50.000,00</h3>
+                    <span class="stat-change neutral">Março 2026</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Realizado</p>
+                    <h3 class="stat-value">R$ 0,00</h3>
+                    <span class="stat-change neutral">0% da meta</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Falta Atingir</p>
+                    <h3 class="stat-value">R$ 50.000,00</h3>
+                    <span class="stat-change neutral">100% restante</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon red">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Dias Restantes</p>
+                    <h3 class="stat-value">25</h3>
+                    <span class="stat-change neutral">dias no mês</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h3>Histórico de Metas</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Meta</th>
+                        <th>Realizado</th>
+                        <th>%</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Março 2026</td>
+                        <td>R$ 50.000,00</td>
+                        <td>R$ 0,00</td>
+                        <td>0%</td>
+                        <td><span class="stat-change neutral">Em andamento</span></td>
+                    </tr>
+                    <tr>
+                        <td>Fevereiro 2026</td>
+                        <td>R$ 45.000,00</td>
+                        <td>R$ 52.300,00</td>
+                        <td>116%</td>
+                        <td><span class="stat-change positive">✓ Atingida</span></td>
+                    </tr>
+                    <tr>
+                        <td>Janeiro 2026</td>
+                        <td>R$ 40.000,00</td>
+                        <td>R$ 38.500,00</td>
+                        <td>96%</td>
+                        <td><span class="stat-change negative">✗ Não atingida</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+async function loadRelatorios() {
+    const content = document.getElementById('page-content');
+    
+    content.innerHTML = `
+        <div class="page-header">
+            <h1>Relatórios</h1>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Vendas Mensais</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('vendas-mensal')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Relatório de Vendas</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Orçamentos</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('orcamentos')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Relatório de Orçamentos</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Inadimplência</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('inadimplencia')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Relatório de Inadimplência</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Novos Clientes</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('clientes')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Relatório de Clientes</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Por Vendedor</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('vendedor')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Relatório por Vendedor</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Lista de Compras</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="gerarRelatorio('lista-compras')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Gerar Lista de Compras</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 async function loadClientes() {
@@ -327,4 +551,12 @@ window.novoCliente = function() {
 
 window.editarCliente = function(id) {
     alert('Editar cliente ID: ' + id);
+};
+
+window.novaMeta = function() {
+    alert('Funcionalidade em desenvolvimento');
+};
+
+window.gerarRelatorio = function(tipo) {
+    alert('Gerando relatório de ' + tipo + '...\nFuncionalidade em desenvolvimento');
 };
