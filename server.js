@@ -29,8 +29,13 @@ app.use('/api/lista-compras', require('./routes/lista-compras'));
 // Servir frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Redirecionar raiz para login
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 const PORT = process.env.PORT || 3000;
