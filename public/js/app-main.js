@@ -412,28 +412,47 @@ async function loadClientes() {
                 <h1>Clientes</h1>
                 <button class="btn btn-primary" data-action="novo-cliente">+ Novo Cliente</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
         `;
         
-        clientes.forEach(c => {
-            html += `<tr>
-                <td>${c.nome}</td>
-                <td>${c.email || '-'}</td>
-                <td>${c.celular || c.telefone || '-'}</td>
-                <td><button class="btn btn-success" data-action="editar-cliente" data-id="${c.id}">Editar</button></td>
-            </tr>`;
-        });
+        if (clientes.length === 0) {
+            html += `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <h3>Nenhum cliente cadastrado</h3>
+                    <p>Clique em "Novo Cliente" para adicionar o primeiro cliente</p>
+                </div>
+            `;
+        } else {
+            html += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            clientes.forEach(c => {
+                html += `<tr>
+                    <td>${c.nome}</td>
+                    <td>${c.email || '-'}</td>
+                    <td>${c.celular || c.telefone || '-'}</td>
+                    <td><button class="btn btn-success" data-action="editar-cliente" data-id="${c.id}">Editar</button></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+        }
         
-        html += '</tbody></table>';
         content.innerHTML = html;
     } catch (error) {
         content.innerHTML = '<div class="card"><p>Erro ao carregar clientes</p></div>';
@@ -578,17 +597,323 @@ document.addEventListener('click', (e) => {
 
 // Funções globais para botões
 function novoCliente() {
-    alert('Funcionalidade em desenvolvimento');
+    showModal('Novo Cliente', `
+        <form id="form-cliente">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label>Razão Social</label>
+                    <input type="text" name="razao_social">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CPF/CNPJ</label>
+                    <input type="text" name="cnpj_cpf">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" name="telefone">
+                </div>
+                <div class="form-group">
+                    <label>Celular</label>
+                    <input type="text" name="celular">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Endereço</label>
+                <input type="text" name="endereco">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cidade</label>
+                    <input type="text" name="cidade">
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select name="estado">
+                        <option value="">Selecione</option>
+                        <option value="AC">AC</option>
+                        <option value="AL">AL</option>
+                        <option value="AP">AP</option>
+                        <option value="AM">AM</option>
+                        <option value="BA">BA</option>
+                        <option value="CE">CE</option>
+                        <option value="DF">DF</option>
+                        <option value="ES">ES</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="MT">MT</option>
+                        <option value="MS">MS</option>
+                        <option value="MG">MG</option>
+                        <option value="PA">PA</option>
+                        <option value="PB">PB</option>
+                        <option value="PR">PR</option>
+                        <option value="PE">PE</option>
+                        <option value="PI">PI</option>
+                        <option value="RJ">RJ</option>
+                        <option value="RN">RN</option>
+                        <option value="RS">RS</option>
+                        <option value="RO">RO</option>
+                        <option value="RR">RR</option>
+                        <option value="SC">SC</option>
+                        <option value="SP">SP</option>
+                        <option value="SE">SE</option>
+                        <option value="TO">TO</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>CEP</label>
+                <input type="text" name="cep">
+            </div>
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea name="observacoes"></textarea>
+            </div>
+        </form>
+    `, async () => {
+        const form = document.getElementById('form-cliente');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        try {
+            const response = await apiRequest('/clientes', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                closeModal();
+                showToast('Cliente cadastrado com sucesso!', 'success');
+                loadClientes();
+            } else {
+                const error = await response.json();
+                showToast(error.error || 'Erro ao cadastrar cliente', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao conectar ao servidor', 'error');
+        }
+    });
 }
 
-function editarCliente(id) {
-    alert('Editar cliente ID: ' + id);
+async function editarCliente(id) {
+    try {
+        const response = await apiRequest(`/clientes/${id}`);
+        const cliente = await response.json();
+        
+        showModal('Editar Cliente', `
+            <form id="form-cliente">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" name="nome" value="${cliente.nome || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Razão Social</label>
+                        <input type="text" name="razao_social" value="${cliente.razao_social || ''}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CPF/CNPJ</label>
+                        <input type="text" name="cnpj_cpf" value="${cliente.cnpj_cpf || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="${cliente.email || ''}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone" value="${cliente.telefone || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Celular</label>
+                        <input type="text" name="celular" value="${cliente.celular || ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Endereço</label>
+                    <input type="text" name="endereco" value="${cliente.endereco || ''}">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" name="cidade" value="${cliente.cidade || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="estado">
+                            <option value="">Selecione</option>
+                            ${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(uf => 
+                                `<option value="${uf}" ${cliente.estado === uf ? 'selected' : ''}>${uf}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CEP</label>
+                    <input type="text" name="cep" value="${cliente.cep || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea name="observacoes">${cliente.observacoes || ''}</textarea>
+                </div>
+            </form>
+        `, async () => {
+            const form = document.getElementById('form-cliente');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await apiRequest(`/clientes/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    showToast('Cliente atualizado com sucesso!', 'success');
+                    loadClientes();
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || 'Erro ao atualizar cliente', 'error');
+                }
+            } catch (error) {
+                showToast('Erro ao conectar ao servidor', 'error');
+            }
+        });
+    } catch (error) {
+        showToast('Erro ao carregar dados do cliente', 'error');
+    }
 }
 
 function novaMeta() {
-    alert('Funcionalidade em desenvolvimento');
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth() + 1;
+    const anoAtual = hoje.getFullYear();
+    
+    showModal('Definir Meta', `
+        <form id="form-meta">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mês *</label>
+                    <select name="mes" required>
+                        ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m => 
+                            `<option value="${m}" ${m === mesAtual ? 'selected' : ''}>${m}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ano *</label>
+                    <input type="number" name="ano" value="${anoAtual}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Valor da Meta (R$) *</label>
+                <input type="number" name="valor_meta" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select name="tipo">
+                    <option value="mensal">Mensal</option>
+                    <option value="anual">Anual</option>
+                </select>
+            </div>
+        </form>
+    `, async () => {
+        const form = document.getElementById('form-meta');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        data.usuario_id = currentUser.id;
+        
+        try {
+            const response = await apiRequest('/metas', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                closeModal();
+                showToast('Meta definida com sucesso!', 'success');
+                loadMetas();
+            } else {
+                const error = await response.json();
+                showToast(error.error || 'Erro ao definir meta', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao conectar ao servidor', 'error');
+        }
+    });
 }
 
 function gerarRelatorio(tipo) {
-    alert('Gerando relatório de ' + tipo + '...\nFuncionalidade em desenvolvimento');
+    showToast(`Gerando relatório de ${tipo}...`, 'success');
+    setTimeout(() => {
+        window.print();
+    }, 500);
+}
+
+// Funções auxiliares
+function showModal(title, content, onSave) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>${title}</h2>
+                <button class="modal-close" data-action="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${content}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-action="close-modal">Cancelar</button>
+                <button class="btn btn-primary" data-action="save-modal">Salvar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('[data-action="close-modal"]').addEventListener('click', closeModal);
+    modal.querySelector('.modal-close').addEventListener('click', closeModal);
+    modal.querySelector('[data-action="save-modal"]').addEventListener('click', onSave);
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="toast-icon">${type === 'success' ? '✓' : '✗'}</div>
+        <div class="toast-message">${message}</div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }
