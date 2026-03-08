@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting
 app.use('/api/', apiLimiter);
 
-// Routes
+// API Routes
 app.use('/api/auth', loginLimiter, require('./routes/auth'));
 app.use('/api/clientes', require('./routes/clientes'));
 app.use('/api/orcamentos', require('./routes/orcamentos'));
@@ -35,15 +35,11 @@ app.use('/api/metas', require('./routes/metas'));
 app.use('/api/relatorios', require('./routes/relatorios'));
 app.use('/api/lista-compras', require('./routes/lista-compras'));
 
-// Servir frontend
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Redirecionar raiz para login
+// Rotas HTML específicas (antes do static para ter prioridade)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Rotas HTML específicas
 app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -51,6 +47,9 @@ app.get('/login.html', (req, res) => {
 app.get('/app.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
+
+// Servir arquivos estáticos (CSS, JS, imagens)
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 
