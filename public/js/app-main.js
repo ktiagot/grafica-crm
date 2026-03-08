@@ -34,133 +34,7 @@ async function loadPage(page) {
     
     switch(page) {
         case 'dashboard':
-            content.innerHTML = `
-                <div class="dashboard">
-                    <div class="dashboard-header">
-                        <div>
-                            <h1>Overview</h1>
-                            <p class="subtitle">Bem-vindo de volta, ${currentUser.nome}!</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon orange">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <p class="stat-label">Total Clientes</p>
-                                <h3 class="stat-value">0</h3>
-                                <span class="stat-change positive">+12% desde último mês</span>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon red">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <p class="stat-label">Orçamentos</p>
-                                <h3 class="stat-value">0</h3>
-                                <span class="stat-change positive">+8% desde último mês</span>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="1" x2="12" y2="23"></line>
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <p class="stat-label">Faturamento</p>
-                                <h3 class="stat-value">R$ 0,00</h3>
-                                <span class="stat-change positive">+23% desde último mês</span>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon blue">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                    <line x1="1" y1="10" x2="23" y2="10"></line>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <p class="stat-label">Pedidos Ativos</p>
-                                <h3 class="stat-value">0</h3>
-                                <span class="stat-change neutral">Sem alteração</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <h3>Atividades Recentes</h3>
-                            </div>
-                            <div class="activity-list">
-                                <div class="activity-item">
-                                    <div class="activity-icon blue">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
-                                    </div>
-                                    <div class="activity-content">
-                                        <p class="activity-title">Sistema iniciado</p>
-                                        <p class="activity-time">Agora mesmo</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <h3>Ações Rápidas</h3>
-                            </div>
-                            <div class="quick-actions">
-                                <button class="quick-action-btn" data-action="clientes">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="8.5" cy="7" r="4"></circle>
-                                        <line x1="20" y1="8" x2="20" y2="14"></line>
-                                        <line x1="23" y1="11" x2="17" y2="11"></line>
-                                    </svg>
-                                    <span>Novo Cliente</span>
-                                </button>
-                                <button class="quick-action-btn" data-action="orcamentos">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                    </svg>
-                                    <span>Novo Orçamento</span>
-                                </button>
-                                <button class="quick-action-btn" data-action="pedidos">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="9" cy="21" r="1"></circle>
-                                        <circle cx="20" cy="21" r="1"></circle>
-                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                    </svg>
-                                    <span>Novo Pedido</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            await loadDashboard();
             break;
         case 'clientes':
             await loadClientes();
@@ -179,6 +53,161 @@ async function loadPage(page) {
             break;
         default:
             content.innerHTML = '<div class="card"><h1>Página em desenvolvimento</h1></div>';
+    }
+}
+
+async function loadDashboard() {
+    const content = document.getElementById('page-content');
+    
+    try {
+        // Buscar dados reais
+        const [resClientes, resOrcamentos, resPedidos] = await Promise.all([
+            apiRequest('/clientes'),
+            apiRequest('/orcamentos'),
+            apiRequest('/pedidos')
+        ]);
+        
+        const clientes = await resClientes.json();
+        const orcamentos = await resOrcamentos.json();
+        const pedidos = await resPedidos.json();
+        
+        // Calcular estatísticas
+        const totalClientes = clientes.length;
+        const totalOrcamentos = orcamentos.length;
+        const totalPedidos = pedidos.filter(p => p.status !== 'cancelado' && p.status !== 'entregue').length;
+        const faturamento = pedidos
+            .filter(p => p.status_pagamento === 'pago')
+            .reduce((sum, p) => sum + parseFloat(p.valor_total || 0), 0);
+        
+        content.innerHTML = `
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div>
+                        <h1>Overview</h1>
+                        <p class="subtitle">Bem-vindo de volta, ${currentUser.nome}!</p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Clientes</p>
+                            <h3 class="stat-value">${totalClientes}</h3>
+                            <span class="stat-change positive">Cadastrados</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Orçamentos</p>
+                            <h3 class="stat-value">${totalOrcamentos}</h3>
+                            <span class="stat-change neutral">Total</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Faturamento</p>
+                            <h3 class="stat-value">R$ ${faturamento.toFixed(2)}</h3>
+                            <span class="stat-change positive">Recebido</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Pedidos Ativos</p>
+                            <h3 class="stat-value">${totalPedidos}</h3>
+                            <span class="stat-change neutral">Em andamento</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Atividades Recentes</h3>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon blue">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <p class="activity-title">${totalClientes} clientes cadastrados</p>
+                                    <p class="activity-time">Total no sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Ações Rápidas</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" data-action="clientes">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                                <span>Novo Cliente</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="orcamentos">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                <span>Novo Orçamento</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="pedidos">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                                <span>Novo Pedido</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        content.innerHTML = '<div class="card"><p>Erro ao carregar dashboard</p></div>';
     }
 }
 
@@ -446,7 +475,10 @@ async function loadClientes() {
                     <td>${c.nome}</td>
                     <td>${c.email || '-'}</td>
                     <td>${c.celular || c.telefone || '-'}</td>
-                    <td><button class="btn btn-success" data-action="editar-cliente" data-id="${c.id}">Editar</button></td>
+                    <td>
+                        <button class="btn btn-success" data-action="editar-cliente" data-id="${c.id}" style="margin-right: 8px;">Editar</button>
+                        <button class="btn btn-danger" data-action="deletar-cliente" data-id="${c.id}">Deletar</button>
+                    </td>
                 </tr>`;
             });
             
@@ -618,6 +650,9 @@ document.addEventListener('click', (e) => {
                 break;
             case 'editar-cliente':
                 editarCliente(id);
+                break;
+            case 'deletar-cliente':
+                deletarCliente(id);
                 break;
             case 'novo-orcamento':
                 novoOrcamento();
@@ -850,6 +885,28 @@ async function editarCliente(id) {
         });
     } catch (error) {
         showToast('Erro ao carregar dados do cliente', 'error');
+    }
+}
+
+async function deletarCliente(id) {
+    if (!confirm('Tem certeza que deseja deletar este cliente?')) {
+        return;
+    }
+    
+    try {
+        const response = await apiRequest(`/clientes/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showToast('Cliente deletado com sucesso!', 'success');
+            loadClientes();
+        } else {
+            const error = await response.json();
+            showToast(error.error || 'Erro ao deletar cliente', 'error');
+        }
+    } catch (error) {
+        showToast('Erro ao conectar ao servidor', 'error');
     }
 }
 
