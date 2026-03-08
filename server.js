@@ -34,8 +34,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.get('*', (req, res) => {
+// Rotas HTML específicas
+app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/app.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 
 const PORT = process.env.PORT || 3000;
