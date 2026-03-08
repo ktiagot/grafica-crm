@@ -469,30 +469,51 @@ async function loadOrcamentos() {
         let html = `
             <div class="page-header">
                 <h1>Orçamentos</h1>
-                <button class="btn btn-primary">+ Novo Orçamento</button>
+                <button class="btn btn-primary" data-action="novo-orcamento">+ Novo Orçamento</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Cliente</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
         `;
         
-        orcamentos.forEach(o => {
-            html += `<tr>
-                <td>${o.numero}</td>
-                <td>${o.cliente_nome}</td>
-                <td>R$ ${parseFloat(o.valor_total).toFixed(2)}</td>
-                <td>${o.status}</td>
-            </tr>`;
-        });
+        if (orcamentos.length === 0) {
+            html += `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    <h3>Nenhum orçamento cadastrado</h3>
+                    <p>Clique em "Novo Orçamento" para criar o primeiro orçamento</p>
+                </div>
+            `;
+        } else {
+            html += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            orcamentos.forEach(o => {
+                html += `<tr>
+                    <td>${o.numero}</td>
+                    <td>${o.cliente_nome}</td>
+                    <td>R$ ${parseFloat(o.valor_total).toFixed(2)}</td>
+                    <td>${o.status}</td>
+                    <td><button class="btn btn-success" data-action="editar-orcamento" data-id="${o.id}">Editar</button></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+        }
         
-        html += '</tbody></table>';
         content.innerHTML = html;
     } catch (error) {
         content.innerHTML = '<div class="card"><p>Erro ao carregar orçamentos</p></div>';
@@ -509,31 +530,52 @@ async function loadPedidos() {
         let html = `
             <div class="page-header">
                 <h1>Pedidos</h1>
+                <button class="btn btn-primary" data-action="novo-pedido">+ Novo Pedido</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Cliente</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Pagamento</th>
-                    </tr>
-                </thead>
-                <tbody>
         `;
         
-        pedidos.forEach(p => {
-            html += `<tr>
-                <td>${p.numero}</td>
-                <td>${p.cliente_nome}</td>
-                <td>R$ ${parseFloat(p.valor_total).toFixed(2)}</td>
-                <td>${p.status}</td>
-                <td>${p.status_pagamento}</td>
-            </tr>`;
-        });
+        if (pedidos.length === 0) {
+            html += `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <h3>Nenhum pedido cadastrado</h3>
+                    <p>Clique em "Novo Pedido" para criar o primeiro pedido</p>
+                </div>
+            `;
+        } else {
+            html += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            pedidos.forEach(p => {
+                html += `<tr>
+                    <td>${p.numero}</td>
+                    <td>${p.cliente_nome}</td>
+                    <td>R$ ${parseFloat(p.valor_total).toFixed(2)}</td>
+                    <td>${p.status}</td>
+                    <td>${p.status_pagamento}</td>
+                    <td><button class="btn btn-success" data-action="editar-pedido" data-id="${p.id}">Editar</button></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+        }
         
-        html += '</tbody></table>';
         content.innerHTML = html;
     } catch (error) {
         content.innerHTML = '<div class="card"><p>Erro ao carregar pedidos</p></div>';
@@ -576,6 +618,18 @@ document.addEventListener('click', (e) => {
                 break;
             case 'editar-cliente':
                 editarCliente(id);
+                break;
+            case 'novo-orcamento':
+                novoOrcamento();
+                break;
+            case 'editar-orcamento':
+                editarOrcamento(id);
+                break;
+            case 'novo-pedido':
+                novoPedido();
+                break;
+            case 'editar-pedido':
+                editarPedido(id);
                 break;
             case 'nova-meta':
                 novaMeta();
@@ -856,6 +910,376 @@ function novaMeta() {
             showToast('Erro ao conectar ao servidor', 'error');
         }
     });
+}
+
+async function novoOrcamento() {
+    // Carregar lista de clientes
+    const responseClientes = await apiRequest('/clientes');
+    const clientes = await responseClientes.json();
+    
+    if (clientes.length === 0) {
+        showToast('Cadastre um cliente primeiro!', 'error');
+        return;
+    }
+    
+    showModal('Novo Orçamento', `
+        <form id="form-orcamento">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Número *</label>
+                    <input type="text" name="numero" value="ORC-${Date.now()}" required>
+                </div>
+                <div class="form-group">
+                    <label>Cliente *</label>
+                    <select name="cliente_id" required>
+                        <option value="">Selecione</option>
+                        ${clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data do Orçamento *</label>
+                    <input type="date" name="data_orcamento" value="${new Date().toISOString().split('T')[0]}" required>
+                </div>
+                <div class="form-group">
+                    <label>Validade</label>
+                    <input type="date" name="validade">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descrição *</label>
+                <textarea name="descricao" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Valor Total (R$) *</label>
+                <input type="number" name="valor_total" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="pendente">Pendente</option>
+                    <option value="aprovado">Aprovado</option>
+                    <option value="rejeitado">Rejeitado</option>
+                    <option value="expirado">Expirado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea name="observacoes"></textarea>
+            </div>
+        </form>
+    `, async () => {
+        const form = document.getElementById('form-orcamento');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        data.vendedor_id = currentUser.id;
+        
+        try {
+            const response = await apiRequest('/orcamentos', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                closeModal();
+                showToast('Orçamento criado com sucesso!', 'success');
+                loadOrcamentos();
+            } else {
+                const error = await response.json();
+                showToast(error.error || 'Erro ao criar orçamento', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao conectar ao servidor', 'error');
+        }
+    });
+}
+
+async function editarOrcamento(id) {
+    try {
+        const [responseOrcamento, responseClientes] = await Promise.all([
+            apiRequest(`/orcamentos/${id}`),
+            apiRequest('/clientes')
+        ]);
+        
+        const orcamento = await responseOrcamento.json();
+        const clientes = await responseClientes.json();
+        
+        showModal('Editar Orçamento', `
+            <form id="form-orcamento">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número *</label>
+                        <input type="text" name="numero" value="${orcamento.numero}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cliente *</label>
+                        <select name="cliente_id" required>
+                            ${clientes.map(c => 
+                                `<option value="${c.id}" ${c.id === orcamento.cliente_id ? 'selected' : ''}>${c.nome}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data do Orçamento *</label>
+                        <input type="date" name="data_orcamento" value="${orcamento.data_orcamento}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Validade</label>
+                        <input type="date" name="validade" value="${orcamento.validade || ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descrição *</label>
+                    <textarea name="descricao" required>${orcamento.descricao || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Valor Total (R$) *</label>
+                    <input type="number" name="valor_total" step="0.01" value="${orcamento.valor_total}" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="pendente" ${orcamento.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+                        <option value="aprovado" ${orcamento.status === 'aprovado' ? 'selected' : ''}>Aprovado</option>
+                        <option value="rejeitado" ${orcamento.status === 'rejeitado' ? 'selected' : ''}>Rejeitado</option>
+                        <option value="expirado" ${orcamento.status === 'expirado' ? 'selected' : ''}>Expirado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea name="observacoes">${orcamento.observacoes || ''}</textarea>
+                </div>
+            </form>
+        `, async () => {
+            const form = document.getElementById('form-orcamento');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await apiRequest(`/orcamentos/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    showToast('Orçamento atualizado com sucesso!', 'success');
+                    loadOrcamentos();
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || 'Erro ao atualizar orçamento', 'error');
+                }
+            } catch (error) {
+                showToast('Erro ao conectar ao servidor', 'error');
+            }
+        });
+    } catch (error) {
+        showToast('Erro ao carregar dados do orçamento', 'error');
+    }
+}
+
+async function novoPedido() {
+    // Carregar lista de clientes
+    const responseClientes = await apiRequest('/clientes');
+    const clientes = await responseClientes.json();
+    
+    if (clientes.length === 0) {
+        showToast('Cadastre um cliente primeiro!', 'error');
+        return;
+    }
+    
+    showModal('Novo Pedido', `
+        <form id="form-pedido">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Número *</label>
+                    <input type="text" name="numero" value="PED-${Date.now()}" required>
+                </div>
+                <div class="form-group">
+                    <label>Cliente *</label>
+                    <select name="cliente_id" required>
+                        <option value="">Selecione</option>
+                        ${clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data do Pedido *</label>
+                    <input type="date" name="data_pedido" value="${new Date().toISOString().split('T')[0]}" required>
+                </div>
+                <div class="form-group">
+                    <label>Data de Entrega</label>
+                    <input type="date" name="data_entrega">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descrição *</label>
+                <textarea name="descricao" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Valor Total (R$) *</label>
+                <input type="number" name="valor_total" step="0.01" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="pendente">Pendente</option>
+                        <option value="producao">Em Produção</option>
+                        <option value="finalizado">Finalizado</option>
+                        <option value="entregue">Entregue</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status Pagamento</label>
+                    <select name="status_pagamento">
+                        <option value="pendente">Pendente</option>
+                        <option value="parcial">Parcial</option>
+                        <option value="pago">Pago</option>
+                        <option value="atrasado">Atrasado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Valor Pago (R$)</label>
+                <input type="number" name="valor_pago" step="0.01" value="0">
+            </div>
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea name="observacoes"></textarea>
+            </div>
+        </form>
+    `, async () => {
+        const form = document.getElementById('form-pedido');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        data.vendedor_id = currentUser.id;
+        
+        try {
+            const response = await apiRequest('/pedidos', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                closeModal();
+                showToast('Pedido criado com sucesso!', 'success');
+                loadPedidos();
+            } else {
+                const error = await response.json();
+                showToast(error.error || 'Erro ao criar pedido', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao conectar ao servidor', 'error');
+        }
+    });
+}
+
+async function editarPedido(id) {
+    try {
+        const [responsePedido, responseClientes] = await Promise.all([
+            apiRequest(`/pedidos/${id}`),
+            apiRequest('/clientes')
+        ]);
+        
+        const pedido = await responsePedido.json();
+        const clientes = await responseClientes.json();
+        
+        showModal('Editar Pedido', `
+            <form id="form-pedido">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número *</label>
+                        <input type="text" name="numero" value="${pedido.numero}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cliente *</label>
+                        <select name="cliente_id" required>
+                            ${clientes.map(c => 
+                                `<option value="${c.id}" ${c.id === pedido.cliente_id ? 'selected' : ''}>${c.nome}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data do Pedido *</label>
+                        <input type="date" name="data_pedido" value="${pedido.data_pedido}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Entrega</label>
+                        <input type="date" name="data_entrega" value="${pedido.data_entrega || ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descrição *</label>
+                    <textarea name="descricao" required>${pedido.descricao || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Valor Total (R$) *</label>
+                    <input type="number" name="valor_total" step="0.01" value="${pedido.valor_total}" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="pendente" ${pedido.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="producao" ${pedido.status === 'producao' ? 'selected' : ''}>Em Produção</option>
+                            <option value="finalizado" ${pedido.status === 'finalizado' ? 'selected' : ''}>Finalizado</option>
+                            <option value="entregue" ${pedido.status === 'entregue' ? 'selected' : ''}>Entregue</option>
+                            <option value="cancelado" ${pedido.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Pagamento</label>
+                        <select name="status_pagamento">
+                            <option value="pendente" ${pedido.status_pagamento === 'pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="parcial" ${pedido.status_pagamento === 'parcial' ? 'selected' : ''}>Parcial</option>
+                            <option value="pago" ${pedido.status_pagamento === 'pago' ? 'selected' : ''}>Pago</option>
+                            <option value="atrasado" ${pedido.status_pagamento === 'atrasado' ? 'selected' : ''}>Atrasado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Valor Pago (R$)</label>
+                    <input type="number" name="valor_pago" step="0.01" value="${pedido.valor_pago || 0}">
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea name="observacoes">${pedido.observacoes || ''}</textarea>
+                </div>
+            </form>
+        `, async () => {
+            const form = document.getElementById('form-pedido');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await apiRequest(`/pedidos/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    showToast('Pedido atualizado com sucesso!', 'success');
+                    loadPedidos();
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || 'Erro ao atualizar pedido', 'error');
+                }
+            } catch (error) {
+                showToast('Erro ao conectar ao servidor', 'error');
+            }
+        });
+    } catch (error) {
+        showToast('Erro ao carregar dados do pedido', 'error');
+    }
 }
 
 function gerarRelatorio(tipo) {
