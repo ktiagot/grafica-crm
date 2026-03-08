@@ -132,7 +132,7 @@ async function loadPage(page) {
                                 <h3>Ações Rápidas</h3>
                             </div>
                             <div class="quick-actions">
-                                <button class="quick-action-btn" onclick="loadPage('clientes')">
+                                <button class="quick-action-btn" data-action="clientes">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="8.5" cy="7" r="4"></circle>
@@ -141,14 +141,14 @@ async function loadPage(page) {
                                     </svg>
                                     <span>Novo Cliente</span>
                                 </button>
-                                <button class="quick-action-btn" onclick="loadPage('orcamentos')">
+                                <button class="quick-action-btn" data-action="orcamentos">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                         <polyline points="14 2 14 8 20 8"></polyline>
                                     </svg>
                                     <span>Novo Orçamento</span>
                                 </button>
-                                <button class="quick-action-btn" onclick="loadPage('pedidos')">
+                                <button class="quick-action-btn" data-action="pedidos">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="9" cy="21" r="1"></circle>
                                         <circle cx="20" cy="21" r="1"></circle>
@@ -188,7 +188,7 @@ async function loadMetas() {
     content.innerHTML = `
         <div class="page-header">
             <h1>Metas Comerciais</h1>
-            <button class="btn btn-primary" onclick="novaMeta()">+ Definir Meta</button>
+            <button class="btn btn-primary" data-action="nova-meta">+ Definir Meta</button>
         </div>
         
         <div class="stats-grid">
@@ -306,7 +306,7 @@ async function loadRelatorios() {
                     <h3>Vendas Mensais</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('vendas-mensal')">
+                    <button class="quick-action-btn" data-relatorio="vendas-mensal">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -322,7 +322,7 @@ async function loadRelatorios() {
                     <h3>Orçamentos</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('orcamentos')">
+                    <button class="quick-action-btn" data-relatorio="orcamentos">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -338,7 +338,7 @@ async function loadRelatorios() {
                     <h3>Inadimplência</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('inadimplencia')">
+                    <button class="quick-action-btn" data-relatorio="inadimplencia">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -354,7 +354,7 @@ async function loadRelatorios() {
                     <h3>Novos Clientes</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('clientes')">
+                    <button class="quick-action-btn" data-relatorio="clientes">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -370,7 +370,7 @@ async function loadRelatorios() {
                     <h3>Por Vendedor</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('vendedor')">
+                    <button class="quick-action-btn" data-relatorio="vendedor">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -386,7 +386,7 @@ async function loadRelatorios() {
                     <h3>Lista de Compras</h3>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="gerarRelatorio('lista-compras')">
+                    <button class="quick-action-btn" data-relatorio="lista-compras">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -410,7 +410,7 @@ async function loadClientes() {
         let html = `
             <div class="page-header">
                 <h1>Clientes</h1>
-                <button class="btn btn-primary" onclick="novoCliente()">+ Novo Cliente</button>
+                <button class="btn btn-primary" data-action="novo-cliente">+ Novo Cliente</button>
             </div>
             <table>
                 <thead>
@@ -429,7 +429,7 @@ async function loadClientes() {
                 <td>${c.nome}</td>
                 <td>${c.email || '-'}</td>
                 <td>${c.celular || c.telefone || '-'}</td>
-                <td><button class="btn btn-success" onclick="editarCliente(${c.id})">Editar</button></td>
+                <td><button class="btn btn-success" data-action="editar-cliente" data-id="${c.id}">Editar</button></td>
             </tr>`;
         });
         
@@ -544,19 +544,51 @@ async function apiRequest(endpoint, options = {}) {
 // Carregar dashboard ao iniciar
 loadPage('dashboard');
 
+// Event delegation para botões dinâmicos
+document.addEventListener('click', (e) => {
+    const target = e.target.closest('[data-action]');
+    if (target) {
+        const action = target.dataset.action;
+        const id = target.dataset.id;
+        
+        switch(action) {
+            case 'novo-cliente':
+                novoCliente();
+                break;
+            case 'editar-cliente':
+                editarCliente(id);
+                break;
+            case 'nova-meta':
+                novaMeta();
+                break;
+            case 'clientes':
+            case 'orcamentos':
+            case 'pedidos':
+                loadPage(action);
+                break;
+        }
+    }
+    
+    // Relatórios
+    const relatorio = e.target.closest('[data-relatorio]');
+    if (relatorio) {
+        gerarRelatorio(relatorio.dataset.relatorio);
+    }
+});
+
 // Funções globais para botões
-window.novoCliente = function() {
+function novoCliente() {
     alert('Funcionalidade em desenvolvimento');
-};
+}
 
-window.editarCliente = function(id) {
+function editarCliente(id) {
     alert('Editar cliente ID: ' + id);
-};
+}
 
-window.novaMeta = function() {
+function novaMeta() {
     alert('Funcionalidade em desenvolvimento');
-};
+}
 
-window.gerarRelatorio = function(tipo) {
+function gerarRelatorio(tipo) {
     alert('Gerando relatório de ' + tipo + '...\nFuncionalidade em desenvolvimento');
-};
+}
