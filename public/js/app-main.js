@@ -39,11 +39,17 @@ async function loadPage(page) {
         case 'clientes':
             await loadClientes();
             break;
+        case 'fornecedores':
+            await loadFornecedores();
+            break;
         case 'orcamentos':
             await loadOrcamentos();
             break;
         case 'pedidos':
             await loadPedidos();
+            break;
+        case 'lista-compras':
+            await loadListaCompras();
             break;
         case 'metas':
             await loadMetas();
@@ -653,6 +659,24 @@ document.addEventListener('click', (e) => {
                 break;
             case 'deletar-cliente':
                 deletarCliente(id);
+                break;
+            case 'novo-fornecedor':
+                novoFornecedor();
+                break;
+            case 'editar-fornecedor':
+                editarFornecedor(id);
+                break;
+            case 'deletar-fornecedor':
+                deletarFornecedor(id);
+                break;
+            case 'novo-item-compra':
+                novoItemCompra();
+                break;
+            case 'editar-item-compra':
+                editarItemCompra(id);
+                break;
+            case 'deletar-item-compra':
+                deletarItemCompra(id);
                 break;
             case 'novo-orcamento':
                 novoOrcamento();

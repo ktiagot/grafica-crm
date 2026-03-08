@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/clientes', require('./routes/clientes'));
+app.use('/api/fornecedores', require('./routes/fornecedores'));
 app.use('/api/orcamentos', require('./routes/orcamentos'));
 app.use('/api/pedidos', require('./routes/pedidos'));
 app.use('/api/metas', require('./routes/metas'));
