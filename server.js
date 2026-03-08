@@ -4,8 +4,6 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-const { apiLimiter, loginLimiter } = require('./middleware/security');
-
 const app = express();
 
 // Security middleware
@@ -13,7 +11,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.sheetjs.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
@@ -24,11 +22,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
-app.use('/api/', apiLimiter);
-
 // API Routes
-app.use('/api/auth', loginLimiter, require('./routes/auth'));
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/clientes', require('./routes/clientes'));
 app.use('/api/orcamentos', require('./routes/orcamentos'));
 app.use('/api/pedidos', require('./routes/pedidos'));
