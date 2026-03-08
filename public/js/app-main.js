@@ -1283,10 +1283,297 @@ async function editarPedido(id) {
 }
 
 function gerarRelatorio(tipo) {
-    showToast(`Gerando relatório de ${tipo}...`, 'success');
-    setTimeout(() => {
-        window.print();
-    }, 500);
+    switch(tipo) {
+        case 'vendas-mensal':
+            exportarVendasMensal();
+            break;
+        case 'orcamentos':
+            exportarOrcamentos();
+            break;
+        case 'inadimplencia':
+            exportarInadimplencia();
+            break;
+        case 'clientes':
+            exportarClientes();
+            break;
+        case 'vendedor':
+            exportarPorVendedor();
+            break;
+        case 'lista-compras':
+            exportarListaCompras();
+            break;
+        default:
+            showToast('Relatório não implementado', 'error');
+    }
+}
+
+async function exportarVendasMensal() {
+    try {
+        const response = await apiRequest('/pedidos');
+        const pedidos = await response.json();
+        
+        // Filtrar pedidos do mês atual
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        const anoAtual = hoje.getFullYear();
+        
+        const pedidosMes = pedidos.filter(p => {
+            const data = new Date(p.data_pedido);
+            return data.getMonth() + 1 === mesAtual && data.getFullYear() === anoAtual;
+        });
+        
+        if (pedidosMes.length === 0) {
+            showToast('Nenhuma venda no mês atual', 'error');
+            return;
+        }
+        
+        const dados = pedidosMes.map(p => ({
+            'Número': p.numero,
+            'Cliente': p.cliente_nome,
+            'Data': new Date(p.data_pedido).toLocaleDateString('pt-BR'),
+            'Valor': parseFloat(p.valor_total).toFixed(2),
+            'Status': p.status,
+            'Pagamento': p.status_pagamento
+        }));
+        
+        const total = pedidosMes.reduce((sum, p) => sum + parseFloat(p.valor_total), 0);
+        dados.push({
+            'Número': '',
+            'Cliente': '',
+            'Data': '',
+            'Valor': '',
+            'Status': '',
+            'Pagamento': ''
+        });
+        dados.push({
+            'Número': 'TOTAL',
+            'Cliente': '',
+            'Data': '',
+            'Valor': total.toFixed(2),
+            'Status': '',
+            'Pagamento': ''
+        });
+        
+        exportarParaExcel(dados, `Vendas_${mesAtual}_${anoAtual}`);
+        showToast('Relatório de vendas exportado!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+async function exportarOrcamentos() {
+    try {
+        const response = await apiRequest('/orcamentos');
+        const orcamentos = await response.json();
+        
+        if (orcamentos.length === 0) {
+            showToast('Nenhum orçamento cadastrado', 'error');
+            return;
+        }
+        
+        const dados = orcamentos.map(o => ({
+            'Número': o.numero,
+            'Cliente': o.cliente_nome,
+            'Data': new Date(o.data_orcamento).toLocaleDateString('pt-BR'),
+            'Validade': o.validade ? new Date(o.validade).toLocaleDateString('pt-BR') : '-',
+            'Valor': parseFloat(o.valor_total).toFixed(2),
+            'Status': o.status
+        }));
+        
+        const total = orcamentos.reduce((sum, o) => sum + parseFloat(o.valor_total), 0);
+        dados.push({
+            'Número': '',
+            'Cliente': '',
+            'Data': '',
+            'Validade': '',
+            'Valor': '',
+            'Status': ''
+        });
+        dados.push({
+            'Número': 'TOTAL',
+            'Cliente': '',
+            'Data': '',
+            'Validade': '',
+            'Valor': total.toFixed(2),
+            'Status': ''
+        });
+        
+        exportarParaExcel(dados, 'Orcamentos');
+        showToast('Relatório de orçamentos exportado!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+async function exportarInadimplencia() {
+    try {
+        const response = await apiRequest('/pedidos');
+        const pedidos = await response.json();
+        
+        const inadimplentes = pedidos.filter(p => 
+            p.status_pagamento === 'atrasado' || p.status_pagamento === 'pendente'
+        );
+        
+        if (inadimplentes.length === 0) {
+            showToast('Nenhum pedido inadimplente', 'success');
+            return;
+        }
+        
+        const dados = inadimplentes.map(p => ({
+            'Número': p.numero,
+            'Cliente': p.cliente_nome,
+            'Data Pedido': new Date(p.data_pedido).toLocaleDateString('pt-BR'),
+            'Valor Total': parseFloat(p.valor_total).toFixed(2),
+            'Valor Pago': parseFloat(p.valor_pago || 0).toFixed(2),
+            'Valor Pendente': (parseFloat(p.valor_total) - parseFloat(p.valor_pago || 0)).toFixed(2),
+            'Status': p.status_pagamento
+        }));
+        
+        const totalPendente = inadimplentes.reduce((sum, p) => 
+            sum + (parseFloat(p.valor_total) - parseFloat(p.valor_pago || 0)), 0
+        );
+        
+        dados.push({
+            'Número': '',
+            'Cliente': '',
+            'Data Pedido': '',
+            'Valor Total': '',
+            'Valor Pago': '',
+            'Valor Pendente': '',
+            'Status': ''
+        });
+        dados.push({
+            'Número': 'TOTAL PENDENTE',
+            'Cliente': '',
+            'Data Pedido': '',
+            'Valor Total': '',
+            'Valor Pago': '',
+            'Valor Pendente': totalPendente.toFixed(2),
+            'Status': ''
+        });
+        
+        exportarParaExcel(dados, 'Inadimplencia');
+        showToast('Relatório de inadimplência exportado!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+async function exportarClientes() {
+    try {
+        const response = await apiRequest('/clientes');
+        const clientes = await response.json();
+        
+        if (clientes.length === 0) {
+            showToast('Nenhum cliente cadastrado', 'error');
+            return;
+        }
+        
+        const dados = clientes.map(c => ({
+            'Nome': c.nome,
+            'Razão Social': c.razao_social || '-',
+            'CPF/CNPJ': c.cnpj_cpf || '-',
+            'Email': c.email || '-',
+            'Telefone': c.telefone || '-',
+            'Celular': c.celular || '-',
+            'Cidade': c.cidade || '-',
+            'Estado': c.estado || '-',
+            'Data Cadastro': new Date(c.criado_em).toLocaleDateString('pt-BR')
+        }));
+        
+        exportarParaExcel(dados, 'Clientes');
+        showToast('Relatório de clientes exportado!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+async function exportarPorVendedor() {
+    try {
+        const response = await apiRequest('/pedidos');
+        const pedidos = await response.json();
+        
+        if (pedidos.length === 0) {
+            showToast('Nenhum pedido cadastrado', 'error');
+            return;
+        }
+        
+        // Agrupar por vendedor
+        const porVendedor = {};
+        pedidos.forEach(p => {
+            const vendedor = p.vendedor_nome || 'Sem vendedor';
+            if (!porVendedor[vendedor]) {
+                porVendedor[vendedor] = {
+                    quantidade: 0,
+                    total: 0
+                };
+            }
+            porVendedor[vendedor].quantidade++;
+            porVendedor[vendedor].total += parseFloat(p.valor_total);
+        });
+        
+        const dados = Object.keys(porVendedor).map(vendedor => ({
+            'Vendedor': vendedor,
+            'Quantidade de Pedidos': porVendedor[vendedor].quantidade,
+            'Valor Total': porVendedor[vendedor].total.toFixed(2),
+            'Ticket Médio': (porVendedor[vendedor].total / porVendedor[vendedor].quantidade).toFixed(2)
+        }));
+        
+        exportarParaExcel(dados, 'Vendas_Por_Vendedor');
+        showToast('Relatório por vendedor exportado!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+async function exportarListaCompras() {
+    try {
+        const response = await apiRequest('/lista-compras');
+        const itens = await response.json();
+        
+        if (itens.length === 0) {
+            showToast('Lista de compras vazia', 'error');
+            return;
+        }
+        
+        const dados = itens.map(i => ({
+            'Item': i.item,
+            'Quantidade': i.quantidade || '-',
+            'Unidade': i.unidade || '-',
+            'Prioridade': i.prioridade,
+            'Status': i.status,
+            'Observações': i.observacoes || '-'
+        }));
+        
+        exportarParaExcel(dados, 'Lista_Compras');
+        showToast('Lista de compras exportada!', 'success');
+    } catch (error) {
+        showToast('Erro ao gerar relatório', 'error');
+    }
+}
+
+function exportarParaExcel(dados, nomeArquivo) {
+    // Criar workbook e worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(dados);
+    
+    // Ajustar largura das colunas
+    const colWidths = [];
+    const headers = Object.keys(dados[0]);
+    headers.forEach(header => {
+        const maxLength = Math.max(
+            header.length,
+            ...dados.map(row => String(row[header] || '').length)
+        );
+        colWidths.push({ wch: Math.min(maxLength + 2, 50) });
+    });
+    ws['!cols'] = colWidths;
+    
+    // Adicionar worksheet ao workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
+    
+    // Gerar arquivo e fazer download
+    XLSX.writeFile(wb, `${nomeArquivo}_${new Date().toISOString().split('T')[0]}.xlsx`);
 }
 
 // Funções auxiliares
