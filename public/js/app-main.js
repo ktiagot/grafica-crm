@@ -201,3 +201,12 @@ async function apiRequest(endpoint, options = {}) {
 
 // Carregar dashboard ao iniciar
 loadPage('dashboard');
+
+// Funções globais para botões
+window.novoCliente = function() {
+    alert('Funcionalidade em desenvolvimento');
+};
+
+window.editarCliente = function(id) {
+    alert('Editar cliente ID: ' + id);
+};
