@@ -220,111 +220,173 @@ async function loadDashboard() {
 async function loadMetas() {
     const content = document.getElementById('page-content');
     
-    content.innerHTML = `
-        <div class="page-header">
-            <h1>Metas Comerciais</h1>
-            <button class="btn btn-primary" data-action="nova-meta">+ Definir Meta</button>
-        </div>
+    try {
+        const response = await apiRequest('/metas');
+        const metas = await response.json();
         
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon orange">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        // Buscar pedidos para calcular realizado
+        const resPedidos = await apiRequest('/pedidos');
+        const pedidos = await resPedidos.json();
+        
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        const anoAtual = hoje.getFullYear();
+        
+        // Encontrar meta do mês atual
+        const metaMesAtual = metas.find(m => m.mes === mesAtual && m.ano === anoAtual);
+        const valorMeta = metaMesAtual ? parseFloat(metaMesAtual.valor_meta) : 0;
+        
+        // Calcular realizado do mês
+        const pedidosMes = pedidos.filter(p => {
+            const data = new Date(p.data_pedido);
+            return data.getMonth() + 1 === mesAtual && data.getFullYear() === anoAtual && p.status_pagamento === 'pago';
+        });
+        const valorRealizado = pedidosMes.reduce((sum, p) => sum + parseFloat(p.valor_total || 0), 0);
+        const percentual = valorMeta > 0 ? ((valorRealizado / valorMeta) * 100).toFixed(1) : 0;
+        const faltaAtingir = Math.max(0, valorMeta - valorRealizado);
+        
+        // Calcular dias restantes no mês
+        const ultimoDia = new Date(anoAtual, mesAtual, 0).getDate();
+        const diasRestantes = ultimoDia - hoje.getDate();
+        
+        let html = `
+            <div class="page-header">
+                <h1>Metas Comerciais</h1>
+                <button class="btn btn-primary" data-action="nova-meta">+ Definir Meta</button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Meta do Mês</p>
+                        <h3 class="stat-value">R$ ${valorMeta.toFixed(2)}</h3>
+                        <span class="stat-change neutral">${mesAtual}/${anoAtual}</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Realizado</p>
+                        <h3 class="stat-value">R$ ${valorRealizado.toFixed(2)}</h3>
+                        <span class="stat-change ${percentual >= 100 ? 'positive' : 'neutral'}">${percentual}% da meta</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Falta Atingir</p>
+                        <h3 class="stat-value">R$ ${faltaAtingir.toFixed(2)}</h3>
+                        <span class="stat-change neutral">${(100 - percentual).toFixed(1)}% restante</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Dias Restantes</p>
+                        <h3 class="stat-value">${diasRestantes}</h3>
+                        <span class="stat-change neutral">dias no mês</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>Histórico de Metas</h3>
+                </div>
+        `;
+        
+        if (metas.length === 0) {
+            html += `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
+                    <h3>Nenhuma meta definida</h3>
+                    <p>Clique em "Definir Meta" para criar a primeira meta</p>
                 </div>
-                <div class="stat-content">
-                    <p class="stat-label">Meta do Mês</p>
-                    <h3 class="stat-value">R$ 50.000,00</h3>
-                    <span class="stat-change neutral">Março 2026</span>
-                </div>
-            </div>
+            `;
+        } else {
+            html += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th>Meta</th>
+                            <th>Realizado</th>
+                            <th>%</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
             
-            <div class="stat-card">
-                <div class="stat-icon green">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Realizado</p>
-                    <h3 class="stat-value">R$ 0,00</h3>
-                    <span class="stat-change neutral">0% da meta</span>
-                </div>
-            </div>
+            // Ordenar metas por ano e mês (mais recente primeiro)
+            metas.sort((a, b) => {
+                if (a.ano !== b.ano) return b.ano - a.ano;
+                return b.mes - a.mes;
+            });
             
-            <div class="stat-card">
-                <div class="stat-icon blue">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Falta Atingir</p>
-                    <h3 class="stat-value">R$ 50.000,00</h3>
-                    <span class="stat-change neutral">100% restante</span>
-                </div>
-            </div>
+            metas.forEach(m => {
+                // Calcular realizado para cada meta
+                const pedidosMeta = pedidos.filter(p => {
+                    const data = new Date(p.data_pedido);
+                    return data.getMonth() + 1 === m.mes && data.getFullYear() === m.ano && p.status_pagamento === 'pago';
+                });
+                const realizadoMeta = pedidosMeta.reduce((sum, p) => sum + parseFloat(p.valor_total || 0), 0);
+                const percentualMeta = ((realizadoMeta / parseFloat(m.valor_meta)) * 100).toFixed(1);
+                
+                const isAtual = m.mes === mesAtual && m.ano === anoAtual;
+                const statusClass = percentualMeta >= 100 ? 'positive' : percentualMeta >= 80 ? 'neutral' : 'negative';
+                const statusText = isAtual ? 'Em andamento' : percentualMeta >= 100 ? '✓ Atingida' : '✗ Não atingida';
+                
+                html += `<tr>
+                    <td>${m.mes}/${m.ano}</td>
+                    <td>R$ ${parseFloat(m.valor_meta).toFixed(2)}</td>
+                    <td>R$ ${realizadoMeta.toFixed(2)}</td>
+                    <td>${percentualMeta}%</td>
+                    <td><span class="stat-change ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-success" data-action="editar-meta" data-id="${m.id}" style="margin-right: 8px;">Editar</button>
+                        <button class="btn btn-danger" data-action="deletar-meta" data-id="${m.id}">Deletar</button>
+                    </td>
+                </tr>`;
+            });
             
-            <div class="stat-card">
-                <div class="stat-icon red">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <p class="stat-label">Dias Restantes</p>
-                    <h3 class="stat-value">25</h3>
-                    <span class="stat-change neutral">dias no mês</span>
-                </div>
-            </div>
-        </div>
+            html += '</tbody></table>';
+        }
         
-        <div class="dashboard-card" style="margin-top: 24px;">
-            <div class="card-header">
-                <h3>Histórico de Metas</h3>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Período</th>
-                        <th>Meta</th>
-                        <th>Realizado</th>
-                        <th>%</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Março 2026</td>
-                        <td>R$ 50.000,00</td>
-                        <td>R$ 0,00</td>
-                        <td>0%</td>
-                        <td><span class="stat-change neutral">Em andamento</span></td>
-                    </tr>
-                    <tr>
-                        <td>Fevereiro 2026</td>
-                        <td>R$ 45.000,00</td>
-                        <td>R$ 52.300,00</td>
-                        <td>116%</td>
-                        <td><span class="stat-change positive">✓ Atingida</span></td>
-                    </tr>
-                    <tr>
-                        <td>Janeiro 2026</td>
-                        <td>R$ 40.000,00</td>
-                        <td>R$ 38.500,00</td>
-                        <td>96%</td>
-                        <td><span class="stat-change negative">✗ Não atingida</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    `;
+        html += '</div>';
+        content.innerHTML = html;
+    } catch (error) {
+        content.innerHTML = '<div class="card"><p>Erro ao carregar metas</p></div>';
+    }
 }
 
 async function loadRelatorios() {
@@ -693,6 +755,12 @@ document.addEventListener('click', (e) => {
             case 'nova-meta':
                 novaMeta();
                 break;
+            case 'editar-meta':
+                editarMeta(id);
+                break;
+            case 'deletar-meta':
+                deletarMeta(id);
+                break;
             case 'clientes':
             case 'orcamentos':
             case 'pedidos':
@@ -991,6 +1059,90 @@ function novaMeta() {
             showToast('Erro ao conectar ao servidor', 'error');
         }
     });
+}
+
+async function editarMeta(id) {
+    try {
+        const response = await apiRequest(`/metas/${id}`);
+        const meta = await response.json();
+        
+        showModal('Editar Meta', `
+            <form id="form-meta">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mês *</label>
+                        <select name="mes" required>
+                            ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m => 
+                                `<option value="${m}" ${m === meta.mes ? 'selected' : ''}>${m}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ano *</label>
+                        <input type="number" name="ano" value="${meta.ano}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Valor da Meta (R$) *</label>
+                    <input type="number" name="valor_meta" step="0.01" value="${meta.valor_meta}" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select name="tipo">
+                        <option value="mensal" ${meta.tipo === 'mensal' ? 'selected' : ''}>Mensal</option>
+                        <option value="anual" ${meta.tipo === 'anual' ? 'selected' : ''}>Anual</option>
+                    </select>
+                </div>
+            </form>
+        `, async () => {
+            const form = document.getElementById('form-meta');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            data.usuario_id = currentUser.id;
+            
+            try {
+                const response = await apiRequest(`/metas/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    showToast('Meta atualizada com sucesso!', 'success');
+                    loadMetas();
+                } else {
+                    const error = await response.json();
+                    showToast(error.error || 'Erro ao atualizar meta', 'error');
+                }
+            } catch (error) {
+                showToast('Erro ao conectar ao servidor', 'error');
+            }
+        });
+    } catch (error) {
+        showToast('Erro ao carregar dados da meta', 'error');
+    }
+}
+
+async function deletarMeta(id) {
+    if (!confirm('Tem certeza que deseja deletar esta meta?')) {
+        return;
+    }
+    
+    try {
+        const response = await apiRequest(`/metas/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showToast('Meta deletada com sucesso!', 'success');
+            loadMetas();
+        } else {
+            const error = await response.json();
+            showToast(error.error || 'Erro ao deletar meta', 'error');
+        }
+    } catch (error) {
+        showToast('Erro ao conectar ao servidor', 'error');
+    }
 }
 
 async function novoOrcamento() {
