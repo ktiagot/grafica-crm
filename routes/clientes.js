@@ -84,4 +84,15 @@ router.put('/:id', auth, clienteValidation, async (req, res) => {
   }
 });
 
+// Deletar cliente
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await db.query('DELETE FROM clientes WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Cliente deletado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar cliente:', error);
+    res.status(500).json({ error: 'Erro ao deletar cliente' });
+  }
+});
+
 module.exports = router;

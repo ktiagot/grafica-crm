@@ -30,6 +30,22 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Buscar item por ID
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const [itens] = await db.query('SELECT * FROM lista_compras WHERE id = ?', [req.params.id]);
+    
+    if (itens.length === 0) {
+      return res.status(404).json({ error: 'Item não encontrado' });
+    }
+
+    res.json(itens[0]);
+  } catch (error) {
+    console.error('Erro ao buscar item:', error);
+    res.status(500).json({ error: 'Erro ao buscar item' });
+  }
+});
+
 // Adicionar item
 router.post('/', auth, async (req, res) => {
   try {
@@ -56,6 +72,21 @@ router.patch('/:id/status', auth, async (req, res) => {
   } catch (error) {
     console.error('Erro ao atualizar status:', error);
     res.status(500).json({ error: 'Erro ao atualizar status' });
+  }
+});
+
+// Atualizar item
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { item, quantidade, unidade, prioridade, status, observacoes } = req.body;
+    await db.query(
+      'UPDATE lista_compras SET item = ?, quantidade = ?, unidade = ?, prioridade = ?, status = ?, observacoes = ? WHERE id = ?',
+      [item, quantidade, unidade, prioridade, status, observacoes, req.params.id]
+    );
+    res.json({ message: 'Item atualizado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao atualizar item:', error);
+    res.status(500).json({ error: 'Erro ao atualizar item' });
   }
 });
 

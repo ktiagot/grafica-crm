@@ -46,6 +46,28 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Buscar pedido por ID
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const [pedidos] = await db.query(`
+      SELECT p.*, c.nome as cliente_nome, u.nome as vendedor_nome
+      FROM pedidos p
+      JOIN clientes c ON p.cliente_id = c.id
+      JOIN usuarios u ON p.vendedor_id = u.id
+      WHERE p.id = ?
+    `, [req.params.id]);
+    
+    if (pedidos.length === 0) {
+      return res.status(404).json({ error: 'Pedido não encontrado' });
+    }
+
+    res.json(pedidos[0]);
+  } catch (error) {
+    console.error('Erro ao buscar pedido:', error);
+    res.status(500).json({ error: 'Erro ao buscar pedido' });
+  }
+});
+
 // Criar pedido
 router.post('/', auth, async (req, res) => {
   const connection = await db.getConnection();
@@ -122,6 +144,36 @@ router.post('/:id/pagamentos', auth, async (req, res) => {
     res.status(500).json({ error: 'Erro ao registrar pagamento' });
   } finally {
     connection.release();
+  }
+});
+
+// Atualizar pedido
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { numero, cliente_id, data_pedido, data_entrega, descricao, valor_total, status, status_pagamento, valor_pago, observacoes } = req.body;
+    
+    await db.query(
+      `UPDATE pedidos SET numero = ?, cliente_id = ?, data_pedido = ?, data_entrega = ?, descricao = ?, valor_total = ?, status = ?, status_pagamento = ?, valor_pago = ?, observacoes = ? WHERE id = ?`,
+      [numero, cliente_id, data_pedido, data_entrega, descricao, valor_total, status, status_pagamento, valor_pago, observacoes, req.params.id]
+    );
+
+    res.json({ message: 'Pedido atualizado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao atualizar pedido:', error);
+    res.status(500).json({ error: 'Erro ao atualizar pedido' });
+  }
+});
+
+// Deletar pedido
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await db.query('DELETE FROM pedido_itens WHERE pedido_id = ?', [req.params.id]);
+    await db.query('DELETE FROM pagamentos WHERE pedido_id = ?', [req.params.id]);
+    await db.query('DELETE FROM pedidos WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Pedido deletado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar pedido:', error);
+    res.status(500).json({ error: 'Erro ao deletar pedido' });
   }
 });
 

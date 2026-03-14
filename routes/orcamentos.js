@@ -119,4 +119,33 @@ router.patch('/:id/status', auth, async (req, res) => {
   }
 });
 
+// Atualizar orçamento
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { numero, cliente_id, data_orcamento, validade, descricao, valor_total, status, observacoes } = req.body;
+    
+    await db.query(
+      `UPDATE orcamentos SET numero = ?, cliente_id = ?, data_orcamento = ?, validade = ?, descricao = ?, valor_total = ?, status = ?, observacoes = ? WHERE id = ?`,
+      [numero, cliente_id, data_orcamento, validade, descricao, valor_total, status, observacoes, req.params.id]
+    );
+
+    res.json({ message: 'Orçamento atualizado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao atualizar orçamento:', error);
+    res.status(500).json({ error: 'Erro ao atualizar orçamento' });
+  }
+});
+
+// Deletar orçamento
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await db.query('DELETE FROM orcamento_itens WHERE orcamento_id = ?', [req.params.id]);
+    await db.query('DELETE FROM orcamentos WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Orçamento deletado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar orçamento:', error);
+    res.status(500).json({ error: 'Erro ao deletar orçamento' });
+  }
+});
+
 module.exports = router;
